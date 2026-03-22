@@ -1,0 +1,9 @@
+*.tfstate
+*.tfvars
+*.tfstate.backup
+*eks-key
+.terraform
+.terraform.lock.hcl
+*.pub
+*.swp
+*.swo

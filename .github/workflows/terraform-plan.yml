@@ -1,0 +1,70 @@
+name: "Terraform Plan"
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/images/**'
+      - '00_eks-bootstrap/**'
+
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/images/**'
+      - '00_eks-bootstrap/**'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: "${{ vars.AWS_REGION }}"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks Scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure AWS Credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.AWS_ACCOUNT_ID }}:role/GitHubActionsWorkflowRole
+          role-session-name: github-actions-session
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3.1.2
+
+      - name: Generate SSH Key Files from Secrets
+        run: |
+          mkdir -p files
+          echo "${{ secrets.SSH_PUBLIC_KEY }}" > ./files/s3app-eks-key.pub
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      # Stage 2: CloudFront
+      - name: Terraform Init (CloudFront)
+        working-directory: cloudfront
+        run: terraform init
+
+      - name: Terraform Validate (CloudFront)
+        working-directory: cloudfront
+        run: terraform validate   # just syntax check, no plan

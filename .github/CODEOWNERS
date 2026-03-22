@@ -1,0 +1,15 @@
+# Global owner
+* @Sreevas-MK
+
+# Terraform
+*.tf @Sreevas-MK
+
+# GitHub workflows
+.github/workflows/* @Sreevas-MK
+
+# Helm charts
+helm/* @Sreevas-MK
+
+# Application code
+application/* @Sreevas-MK
+

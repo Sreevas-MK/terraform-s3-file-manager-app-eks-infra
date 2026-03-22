@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+  labels:
+    grafana_datasource: "1"
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://monitoring-stack-prometheus-server:9090
+        access: proxy
+        isDefault: true
+      - name: Loki
+        type: loki
+        url: http://monitoring-stack-loki:3100
+        access: proxy
+        isDefault: false
