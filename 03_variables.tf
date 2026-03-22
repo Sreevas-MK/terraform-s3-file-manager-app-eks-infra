@@ -127,6 +127,12 @@ variable "github_username" {
   default = "Sreevas-MK"
 }
 
+variable "wsl_user" {
+  description = "Local wsl user"
+  type        = string
+  default     = "sreevas"
+}
+
 variable "github_repo" {
   default = "s3-nodejs-app-eks-infra"
 }
